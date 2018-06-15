@@ -126,6 +126,18 @@ Json::Value Debug::debug_traceBlockByNumber(int _blockNumber, Json::Value const&
 	return ret;
 }
 
+State Debug::getState(string const& _blockHashOrNumber, int _txIndex)
+{
+    Block block(0);
+    State state(State::Null);
+    if (isHash<h256>(_blockHashOrNumber))
+        block = m_eth.block(Debug::blockHash(_blockHashOrNumber));
+    else
+        block = m_eth.ClientBase::block(jsToBlockNumber(_blockHashOrNumber));
+    createIntermediateState(state, block, _txIndex, m_eth.blockChain());
+    return state;
+}
+
 Json::Value Debug::debug_accountRangeAt(
     string const& _blockHashOrNumber, int _txIndex, string const& _addressHash, int _maxResults)
 {
@@ -138,15 +150,10 @@ Json::Value Debug::debug_accountRangeAt(
 
     try
     {
-        Block block = m_eth.block(blockHash(_blockHashOrNumber));
-        size_t const i = std::min(static_cast<size_t>(_txIndex), block.pending().size());
-        State state(State::Null);
-        createIntermediateState(state, block, i, m_eth.blockChain());
-       
+        State state = getState(_blockHashOrNumber, _txIndex);
         auto const addressMap = state.addresses(h256(_addressHash), _maxResults);
-
         Json::Value addressList(Json::objectValue);
-        for (auto const& record : addressMap.first)
+        for (auto const& record: addressMap.first)
             addressList[toString(record.first)] = toString(record.second);
 
         ret["addressMap"] = addressList;
@@ -174,13 +181,8 @@ Json::Value Debug::debug_storageRangeAt(string const& _blockHashOrNumber, int _t
 
 	try
 	{
-		Block block = m_eth.block(blockHash(_blockHashOrNumber));
-
-		unsigned const i = ((unsigned)_txIndex < block.pending().size()) ? (unsigned)_txIndex : block.pending().size();
-		State state(State::Null);
-		createIntermediateState(state, block, i, m_eth.blockChain());
-
-		map<h256, pair<u256, u256>> const storage(state.storage(Address(_address)));
+        State state = getState(_blockHashOrNumber, _txIndex);
+        map<h256, pair<u256, u256>> const storage(state.storage(Address(_address)));
 
 		// begin is inclusive
 		auto itBegin = storage.lower_bound(h256fromHex(_begin));
