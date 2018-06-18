@@ -19,14 +19,14 @@
  * @date 2016
  */
 
-#include <libethereum/EthereumHost.h>
+//#include <libethereum/EthereumHost.h>
 #include <libethereum/ClientTest.h>
 #include <boost/filesystem/path.hpp>
 
 using namespace std;
 using namespace dev;
 using namespace dev::eth;
-using namespace p2p;
+//using namespace p2p;
 namespace fs = boost::filesystem;
 
 ClientTest& dev::eth::asClientTest(Interface& _c)
@@ -39,13 +39,13 @@ ClientTest* dev::eth::asClientTest(Interface* _c)
     return &dynamic_cast<ClientTest&>(*_c);
 }
 
-ClientTest::ClientTest(ChainParams const& _params, int _networkID, p2p::Host* _host,
+ClientTest::ClientTest(ChainParams const& _params, int _networkID,//, p2p::Host* _host,
     std::shared_ptr<GasPricer> _gpForAdoption, fs::path const& _dbPath, WithExisting _forceAction,
     TransactionQueue::Limits const& _limits)
   : Client(
-        _params, _networkID, _host, _gpForAdoption, _dbPath, std::string(), _forceAction, _limits)
+        _params, _networkID, _gpForAdoption, _dbPath, std::string(), _forceAction, _limits)
 {}
-
+//_host,
 ClientTest::~ClientTest()
 {
     m_signalled.notify_all(); // to wake up the thread from Client::doWork()
@@ -71,8 +71,8 @@ void ClientTest::setChainParams(string const& _genesis)
 
 bool ClientTest::addBlock(string const& _rlp)
 {
-    if (auto h = m_host.lock())
-        h->noteNewBlocks();
+//    if (auto h = m_host.lock())
+//        h->noteNewBlocks();
 
     bytes rlpBytes = fromHex(_rlp, WhenError::Throw);
     RLP blockRLP(rlpBytes);
@@ -122,10 +122,10 @@ void ClientTest::onNewBlocks(h256s const& _blocks, h256Hash& io_changed)
 
 bool ClientTest::completeSync()
 {
-    auto h = m_host.lock();
-    if (!h)
-        return false;
-
-    h->completeSync();
+//    auto h = m_host.lock();
+//    if (!h)
+//        return false;
+//
+//    h->completeSync();
     return true;
 }

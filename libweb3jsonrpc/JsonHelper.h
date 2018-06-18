@@ -22,7 +22,7 @@
 #pragma once
 
 #include <json/json.h>
-#include <libp2p/Common.h>
+//#include <libp2p/Common.h>
 #include <libethcore/Common.h>
 #include <libethcore/BlockHeader.h>
 #include <libethereum/LogFilter.h>
@@ -37,7 +37,7 @@ Json::Value toJson(Address const& _address);
 namespace p2p
 {
 
-Json::Value toJson(PeerSessionInfo const& _p);
+//Json::Value toJson(PeerSessionInfo const& _p);
 
 }
 

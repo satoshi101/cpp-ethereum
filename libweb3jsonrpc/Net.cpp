@@ -33,12 +33,12 @@ Net::Net(NetworkFace& _network): m_network(_network) {}
 
 std::string Net::net_version()
 {
-	return toString(m_network.networkId());
+	return "";//toString(m_network.networkId());
 }
 
 std::string Net::net_peerCount()
 {
-	return toJS(m_network.peerCount());
+	return "";//toJS(m_network.peerCount());
 }
 
 bool Net::net_listening()

@@ -132,7 +132,7 @@ include_directories("${CMAKE_SOURCE_DIR}")
 
 add_subdirectory(libdevcore)
 add_subdirectory(libdevcrypto)
-add_subdirectory(libp2p)
+
 
 add_subdirectory(libethcore)
 add_subdirectory(libevm)

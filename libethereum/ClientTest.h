@@ -40,7 +40,7 @@ public:
 	ClientTest(
 		ChainParams const& _params,
 		int _networkID,
-		p2p::Host* _host,
+//		p2p::Host* _host,
 		std::shared_ptr<GasPricer> _gpForAdoption,
 		boost::filesystem::path const& _dbPath = boost::filesystem::path(),
 		WithExisting _forceAction = WithExisting::Trust,

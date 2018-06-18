@@ -31,7 +31,7 @@
 #include <libdevcore/CommonIO.h>
 #include <libdevcore/Guards.h>
 #include <libdevcore/Exceptions.h>
-#include <libp2p/Host.h>
+//#include <libp2p/Host.h>
 #include <libethereum/Client.h>
 #include <libethereum/ChainParams.h>
 
@@ -49,47 +49,48 @@ namespace eth { class Interface; }
 namespace shh { class Interface; }
 namespace bzz { class Interface; class Client; }
 
+
 class NetworkFace
 {
 public:
     virtual ~NetworkFace() = default;
 
     /// Get information concerning this node.
-    virtual p2p::NodeInfo nodeInfo() const = 0;
+//    virtual p2p::NodeInfo nodeInfo() const = 0;
 
     /// Get information on the current peer set.
-    virtual std::vector<p2p::PeerSessionInfo> peers() = 0;
+//    virtual std::vector<p2p::PeerSessionInfo> peers() = 0;
 
     /// Same as peers().size(), but more efficient.
-    virtual size_t peerCount() const = 0;
+//    virtual size_t peerCount() const = 0;
 
     /// Generalised peer addition.
-    virtual void addPeer(p2p::NodeSpec const& _node, p2p::PeerType _t) = 0;
+//    virtual void addPeer(p2p::NodeSpec const& _node, p2p::PeerType _t) = 0;
 
     /// Add node to connect to.
-    virtual void addNode(p2p::NodeID const& _node, bi::tcp::endpoint const& _hostEndpoint) = 0;
+//    virtual void addNode(p2p::NodeID const& _node, bi::tcp::endpoint const& _hostEndpoint) = 0;
     
     /// Require connection to peer.
-    virtual void requirePeer(p2p::NodeID const& _node, bi::tcp::endpoint const& _endpoint) = 0;
+//    virtual void requirePeer(p2p::NodeID const& _node, bi::tcp::endpoint const& _endpoint) = 0;
     
     /// Save peers
-    virtual dev::bytes saveNetwork() = 0;
+//    virtual dev::bytes saveNetwork() = 0;
 
     /// Sets the ideal number of peers.
-    virtual void setIdealPeerCount(size_t _n) = 0;
+//    virtual void setIdealPeerCount(size_t _n) = 0;
 
-    virtual bool haveNetwork() const = 0;
+//    virtual bool haveNetwork() const = 0;
 
-    virtual p2p::NetworkPreferences const& networkPreferences() const = 0;
-    virtual void setNetworkPreferences(p2p::NetworkPreferences const& _n, bool _dropPeers) = 0;
+//    virtual p2p::NetworkPreferences const& networkPreferences() const = 0;
+//    virtual void setNetworkPreferences(p2p::NetworkPreferences const& _n, bool _dropPeers) = 0;
 
-    virtual p2p::NodeID id() const = 0;
+//    virtual p2p::NodeID id() const = 0;
 
     /// Get network id
-    virtual u256 networkId() const = 0;
+//    virtual u256 networkId() const = 0;
 
     /// Gets the nodes.
-    virtual p2p::Peers nodes() const = 0;
+//    virtual p2p::Peers nodes() const = 0;
 
     /// Start the network subsystem.
     virtual void startNetwork() = 0;
@@ -124,7 +125,7 @@ public:
         boost::filesystem::path const& _snapshotPath, eth::ChainParams const& _params,
         WithExisting _we = WithExisting::Trust,
         std::set<std::string> const& _interfaces = {"eth", "shh", "bzz"},
-        p2p::NetworkPreferences const& _n = p2p::NetworkPreferences(),
+        //p2p::NetworkPreferences const& _n = p2p::NetworkPreferences(),
         bytesConstRef _network = bytesConstRef(), bool _testing = false);
 
     /// Destructor.
@@ -147,73 +148,73 @@ public:
     // Network stuff:
 
     /// Get information on the current peer set.
-    std::vector<p2p::PeerSessionInfo> peers() override;
+//    std::vector<p2p::PeerSessionInfo> peers() override;
 
     /// Same as peers().size(), but more efficient.
-    size_t peerCount() const override;
+//    size_t peerCount() const override;
     
     /// Generalised peer addition.
-    virtual void addPeer(p2p::NodeSpec const& _node, p2p::PeerType _t) override;
+//    virtual void addPeer(p2p::NodeSpec const& _node, p2p::PeerType _t) override;
 
     /// Add node to connect to.
-    virtual void addNode(p2p::NodeID const& _node, bi::tcp::endpoint const& _hostEndpoint) override;
+//    virtual void addNode(p2p::NodeID const& _node, bi::tcp::endpoint const& _hostEndpoint) override;
 
     /// Add node to connect to.
-    void addNode(p2p::NodeID const& _node, std::string const& _hostString) { addNode(_node, p2p::Network::resolveHost(_hostString)); }
+//    void addNode(p2p::NodeID const& _node, std::string const& _hostString) { addNode(_node, p2p::Network::resolveHost(_hostString)); }
     
     /// Add node to connect to.
-    void addNode(bi::tcp::endpoint const& _endpoint) { addNode(p2p::NodeID(), _endpoint); }
+//    void addNode(bi::tcp::endpoint const& _endpoint) { }//addNode(p2p::NodeID(), _endpoint); }
 
     /// Add node to connect to.
-    void addNode(std::string const& _hostString) { addNode(p2p::NodeID(), _hostString); }
+//    void addNode(std::string const& _hostString) { }// addNode(p2p::NodeID(), _hostString); }
     
     /// Require connection to peer.
-    void requirePeer(p2p::NodeID const& _node, bi::tcp::endpoint const& _endpoint) override;
+//    void requirePeer(p2p::NodeID const& _node, bi::tcp::endpoint const& _endpoint) override;
 
     /// Require connection to peer.
-    void requirePeer(p2p::NodeID const& _node, std::string const& _hostString) { requirePeer(_node, p2p::Network::resolveHost(_hostString)); }
+//    void requirePeer(p2p::NodeID const& _node, std::string const& _hostString) { requirePeer(_node, p2p::Network::resolveHost(_hostString)); }
 
     /// Save peers
-    dev::bytes saveNetwork() override;
+//    dev::bytes saveNetwork() override;
 
     /// Sets the ideal number of peers.
-    void setIdealPeerCount(size_t _n) override;
+//    void setIdealPeerCount(size_t _n) override;
 
     /// Experimental. Sets ceiling for incoming connections to multiple of ideal peer count.
-    void setPeerStretch(size_t _n);
+//    void setPeerStretch(size_t _n);
     
-    bool haveNetwork() const override { return m_net.haveNetwork(); }
+//    bool haveNetwork() const override { return m_net.haveNetwork(); }
 
-    p2p::NetworkPreferences const& networkPreferences() const override;
+//    p2p::NetworkPreferences const& networkPreferences() const override;
 
-    void setNetworkPreferences(p2p::NetworkPreferences const& _n, bool _dropPeers = false) override;
+//    void setNetworkPreferences(p2p::NetworkPreferences const& _n, bool _dropPeers = false) override;
 
-    p2p::NodeInfo nodeInfo() const override { return m_net.nodeInfo(); }
+//    p2p::NodeInfo nodeInfo() const override { return m_net.nodeInfo(); }
 
-    p2p::NodeID id() const override { return m_net.id(); }
+//    p2p::NodeID id() const override { return m_net.id(); }
 
-    u256 networkId() const override { return m_ethereum.get()->networkId(); }
+//    u256 networkId() const override { return m_ethereum.get()->networkId(); }
 
-    std::string enode() const override { return m_net.enode(); }
+    std::string enode() const override { return ""; /*m_net.enode();*/ }
 
     /// Gets the nodes.
-    p2p::Peers nodes() const override { return m_net.getPeers(); }
+//    p2p::Peers nodes() const override { return m_net.getPeers(); }
 
     /// Start the network subsystem.
-    void startNetwork() override { m_net.start(); }
+    void startNetwork() override {}// m_net.start(); }
 
     /// Stop the network subsystem.
-    void stopNetwork() override { m_net.stop(); }
+    void stopNetwork() override {}// m_net.stop(); }
 
     /// Is network working? there may not be any peers yet.
-    bool isNetworkStarted() const override { return m_net.isStarted(); }
+    bool isNetworkStarted() const override { return true; } //m_net.isStarted(); }
 
 private:
     std::string m_clientVersion;                    ///< Our end-application client's name/version.
 
     std::unique_ptr<eth::Client> m_ethereum;        ///< Client for Ethereum ("eth") protocol.
 
-    p2p::Host m_net;                                ///< Should run in background and send us events when blocks found and allow us to send blocks as required.
+//    p2p::Host m_net;                                ///< Should run in background and send us events when blocks found and allow us to send blocks as required.
 };
 
 

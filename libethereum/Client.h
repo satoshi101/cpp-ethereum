@@ -33,7 +33,7 @@
 #include <libdevcore/Guards.h>
 #include <libdevcore/Worker.h>
 #include <libethcore/SealEngine.h>
-#include <libp2p/Common.h>
+//#include <libp2p/Common.h>
 #include <array>
 #include <atomic>
 #include <condition_variable>
@@ -78,7 +78,7 @@ public:
     Client(
         ChainParams const& _params,
         int _networkID,
-        p2p::Host* _host,
+//        p2p::Host* _host,
         std::shared_ptr<GasPricer> _gpForAdoption,
         boost::filesystem::path const& _dbPath = boost::filesystem::path(),
         boost::filesystem::path const& _snapshotPath = boost::filesystem::path(),
@@ -214,7 +214,8 @@ public:
 protected:
     /// Perform critical setup functions.
     /// Must be called in the constructor of the finally derived class.
-    void init(p2p::Host* _extNet, boost::filesystem::path const& _dbPath,
+//    p2p::Host* _extNet,
+    void init(boost::filesystem::path const& _dbPath,
         boost::filesystem::path const& _snapshotPath, WithExisting _forceAction, u256 _networkId);
 
     /// InterfaceStub methods
