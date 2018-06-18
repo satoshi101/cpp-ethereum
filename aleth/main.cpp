@@ -65,7 +65,7 @@
 
 using namespace std;
 using namespace dev;
-using namespace dev::p2p;
+//using namespace dev::p2p;
 using namespace dev::eth;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -220,7 +220,7 @@ int main(int argc, char** argv)
 
     unsigned peers = 11;
     unsigned peerStretch = 7;
-    std::map<NodeID, pair<NodeIPEndpoint,bool>> preferredNodes;
+//    std::map<NodeID, pair<NodeIPEndpoint,bool>> preferredNodes;
     bool bootstrap = true;
     bool disableDiscovery = false;
     bool enableDiscovery = false;
@@ -470,7 +470,7 @@ int main(int argc, char** argv)
             string type;
             string pubk;
             string hostIP;
-            unsigned short port = c_defaultListenPort;
+            //unsigned short port = 0;// = c_defaultListenPort;
 
             // type:key@ip[:port]
             vector<string> typeAndKeyAtHostAndPort;
@@ -480,7 +480,8 @@ int main(int argc, char** argv)
 
             type = typeAndKeyAtHostAndPort[0];
             if (typeAndKeyAtHostAndPort.size() == 3)
-                port = (uint16_t)atoi(typeAndKeyAtHostAndPort[2].c_str());
+                //port = (uint16_t)atoi(typeAndKeyAtHostAndPort[2].c_str());
+            {}
 
             vector<string> keyAndHost;
             boost::split(keyAndHost, typeAndKeyAtHostAndPort[1], boost::is_any_of("@"));
@@ -502,7 +503,7 @@ int main(int argc, char** argv)
             Public publicKey(fromHex(pubk));
             try
             {
-                preferredNodes[publicKey] = make_pair(NodeIPEndpoint(bi::address::from_string(hostIP), port, port), required);
+//                preferredNodes[publicKey] = make_pair(NodeIPEndpoint(bi::address::from_string(hostIP), port, port), required);
             }
             catch (...)
             {
@@ -849,9 +850,15 @@ int main(int argc, char** argv)
         return getPassword("Enter password for address " + keyManager.accountName(a) + " (" + a.abridged() + "; hint:" + keyManager.passwordHint(a) + "): ");
     };
 
-    auto netPrefs = publicIP.empty() ? NetworkPreferences(listenIP, listenPort, upnp) : NetworkPreferences(publicIP, listenIP ,listenPort, upnp);
-    netPrefs.discovery = (privateChain.empty() && !disableDiscovery) || enableDiscovery;
-    netPrefs.pin = vm.count("pin") != 0;
+    (void)upnp;
+    (void)listenPort;
+    (void)remotePort;
+    (void)peers;
+    (void)peerStretch;
+    (void)disableDiscovery;
+//    auto netPrefs = publicIP.empty() ? NetworkPreferences(listenIP, listenPort, upnp) : NetworkPreferences(publicIP, listenIP ,listenPort, upnp);
+//    netPrefs.discovery = (privateChain.empty() && !disableDiscovery) || enableDiscovery;
+//    netPrefs.pin = vm.count("pin") != 0;
 
     auto nodesState = contents(getDataDir() / fs::path("network.rlp"));
     auto caps = set<string>{"eth"};
@@ -864,7 +871,8 @@ int main(int argc, char** argv)
 
     dev::WebThreeDirect web3(WebThreeDirect::composeClientVersion("aleth"), getDataDir(),
         snapshotPath, chainParams, withExisting, nodeMode == NodeMode::Full ? caps : set<string>(),
-        netPrefs, &nodesState, testingMode);
+//        netPrefs,
+                             &nodesState, testingMode);
 
     if (!extraData.empty())
         web3.ethereum()->setExtraData(extraData);
@@ -1020,8 +1028,8 @@ int main(int argc, char** argv)
     }
 
 
-    web3.setIdealPeerCount(peers);
-    web3.setPeerStretch(peerStretch);
+//    web3.setIdealPeerCount(peers);
+//    web3.setPeerStretch(peerStretch);
     std::shared_ptr<eth::TrivialGasPricer> gasPricer =
         make_shared<eth::TrivialGasPricer>(askPrice, bidPrice);
     eth::Client* c = nodeMode == NodeMode::Full ? web3.ethereum() : nullptr;
@@ -1042,7 +1050,7 @@ int main(int argc, char** argv)
     if (author)
         cout << "Mining Beneficiary: " << renderFullAddress(author) << "\n";
 
-    if (bootstrap || !remoteHost.empty() || enableDiscovery || listenSet || !preferredNodes.empty())
+    if (bootstrap || !remoteHost.empty() || enableDiscovery || listenSet)// || !preferredNodes.empty())
     {
         web3.startNetwork();
         cout << "Node ID: " << web3.enode() << "\n";
@@ -1118,17 +1126,17 @@ int main(int argc, char** argv)
         cout << "JSONRPC Admin Session Key: " << jsonAdmin << "\n";
     }
 
-    for (auto const& p: preferredNodes)
-        if (p.second.second)
-            web3.requirePeer(p.first, p.second.first);
-        else
-            web3.addNode(p.first, p.second.first);
+//    for (auto const& p: preferredNodes)
+//        if (p.second.second)
+//            web3.requirePeer(p.first, p.second.first);
+//        else
+//            web3.addNode(p.first, p.second.first);
 
-    if (bootstrap && privateChain.empty())
-        for (auto const& i: Host::pocHosts())
-            web3.requirePeer(i.first, i.second);
-    if (!remoteHost.empty())
-        web3.addNode(p2p::NodeID(), remoteHost + ":" + toString(remotePort));
+//    if (bootstrap && privateChain.empty())
+//        for (auto const& i: Host::pocHosts())
+//            web3.requirePeer(i.first, i.second);
+//    if (!remoteHost.empty())
+//        web3.addNode(p2p::NodeID(), remoteHost + ":" + toString(remotePort));
 
     signal(SIGABRT, &ExitHandler::exitHandler);
     signal(SIGTERM, &ExitHandler::exitHandler);
@@ -1150,8 +1158,8 @@ int main(int argc, char** argv)
     if (jsonrpcIpcServer.get())
         jsonrpcIpcServer->StopListening();
 
-    auto netData = web3.saveNetwork();
-    if (!netData.empty())
-        writeFile(getDataDir() / fs::path("network.rlp"), netData);
+//    auto netData = web3.saveNetwork();
+//    if (!netData.empty())
+//        writeFile(getDataDir() / fs::path("network.rlp"), netData);
     return 0;
 }

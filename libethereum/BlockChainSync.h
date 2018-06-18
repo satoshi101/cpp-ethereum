@@ -27,7 +27,6 @@
 #include <libdevcore/Guards.h>
 #include <libethcore/Common.h>
 #include <libethcore/BlockHeader.h>
-#include <libp2p/Common.h>
 #include "CommonNet.h"
 
 namespace dev
@@ -49,7 +48,7 @@ class EthereumPeer;
 class BlockChainSync final: public HasInvariants
 {
 public:
-    BlockChainSync(EthereumHost& _host);
+    BlockChainSync();
     ~BlockChainSync();
     void abortSync(); ///< Abort all sync activity
 
@@ -95,8 +94,8 @@ private:
     /// Enter waiting state
     void pauseSync();
 
-    EthereumHost& host() { return m_host; }
-    EthereumHost const& host() const { return m_host; }
+//    EthereumHost& host() { return m_host; }
+//    EthereumHost const& host() const { return m_host; }
 
     void resetSync();
     void syncPeer(std::shared_ptr<EthereumPeer> _peer, bool _force);
@@ -139,7 +138,7 @@ private:
         }
     };
 
-    EthereumHost& m_host;
+    //EthereumHost& m_host;
     Handler<> m_bqRoomAvailable;				///< Triggered once block queue has space for more blocks
     mutable RecursiveMutex x_sync;
     std::set<std::weak_ptr<EthereumPeer>, std::owner_less<std::weak_ptr<EthereumPeer>>> m_daoChallengedPeers; ///> Peers to which we've sent DAO challenge request

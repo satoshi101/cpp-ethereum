@@ -61,21 +61,21 @@ Json::Value toJson(Address const& _address)
 namespace p2p
 {
 
-Json::Value toJson(p2p::PeerSessionInfo const& _p)
-{
-    //@todo localAddress
-    //@todo protocols
-    Json::Value ret;
-    ret["id"] = _p.id.hex();
-    ret["name"] = _p.clientVersion;
-    ret["network"]["remoteAddress"] = _p.host + ":" + toString(_p.port);
-    ret["lastPing"] = (int)chrono::duration_cast<chrono::milliseconds>(_p.lastPing).count();
-    for (auto const& i: _p.notes)
-        ret["notes"][i.first] = i.second;
-    for (auto const& i: _p.caps)
-        ret["caps"].append(i.first + "/" + toString((unsigned)i.second));
-    return ret;
-}
+//Json::Value toJson(p2p::PeerSessionInfo const& _p)
+//{
+//    //@todo localAddress
+//    //@todo protocols
+//    Json::Value ret;
+//    ret["id"] = _p.id.hex();
+//    ret["name"] = _p.clientVersion;
+//    ret["network"]["remoteAddress"] = _p.host + ":" + toString(_p.port);
+//    ret["lastPing"] = (int)chrono::duration_cast<chrono::milliseconds>(_p.lastPing).count();
+//    for (auto const& i: _p.notes)
+//        ret["notes"][i.first] = i.second;
+//    for (auto const& i: _p.caps)
+//        ret["caps"].append(i.first + "/" + toString((unsigned)i.second));
+//    return ret;
+//}
 
 }
 

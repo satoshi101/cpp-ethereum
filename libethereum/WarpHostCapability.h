@@ -19,13 +19,15 @@
 
 #include "WarpPeerCapability.h"
 
+#include <libdevcore/RLP.h>
 #include <libdevcore/Worker.h>
 
 namespace dev
 {
 namespace eth
 {
-class WarpHostCapability : public p2p::HostCapability<WarpPeerCapability>, Worker
+    //public p2p::HostCapability<WarpPeerCapability>,
+class WarpHostCapability :  Worker
 {
 public:
     WarpHostCapability(BlockChain const& _blockChain, u256 const& _networkId,
@@ -37,8 +39,8 @@ public:
     u256 networkId() const { return m_networkId; }
 
 protected:
-    std::shared_ptr<p2p::Capability> newPeerCapability(std::shared_ptr<p2p::SessionFace> const& _s,
-        unsigned _idOffset, p2p::CapDesc const& _cap) override;
+//    std::shared_ptr<p2p::Capability> newPeerCapability(std::shared_ptr<p2p::SessionFace> const& _s,
+//        unsigned _idOffset, p2p::CapDesc const& _cap) override;
 
 private:
     std::shared_ptr<WarpPeerObserverFace> createPeerObserver(

@@ -25,7 +25,7 @@
 using namespace std;
 using namespace dev;
 using namespace dev::eth;
-using namespace p2p;
+//using namespace p2p;
 namespace fs = boost::filesystem;
 
 EthashClient& dev::eth::asEthashClient(Interface& _c)
@@ -44,13 +44,14 @@ EthashClient* dev::eth::asEthashClient(Interface* _c)
 
 DEV_SIMPLE_EXCEPTION(ChainParamsNotEthash);
 
-EthashClient::EthashClient(ChainParams const& _params, int _networkID, p2p::Host* _host,
+EthashClient::EthashClient(ChainParams const& _params, int _networkID,// p2p::Host* _host,
     std::shared_ptr<GasPricer> _gpForAdoption, fs::path const& _dbPath,
     fs::path const& _snapshotPath, WithExisting _forceAction,
     TransactionQueue::Limits const& _limits)
   : Client(
-        _params, _networkID, _host, _gpForAdoption, _dbPath, _snapshotPath, _forceAction, _limits)
+        _params, _networkID, _gpForAdoption, _dbPath, _snapshotPath, _forceAction, _limits)
 {
+    //_host,
     // will throw if we're not an Ethash seal engine.
     asEthashClient(*this);
 }

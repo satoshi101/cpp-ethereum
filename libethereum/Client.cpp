@@ -22,12 +22,12 @@
 #include "Client.h"
 #include "Block.h"
 #include "Defaults.h"
-#include "EthereumHost.h"
+//#include "EthereumHost.h"
 #include "Executive.h"
 #include "SnapshotStorage.h"
 #include "TransactionQueue.h"
 #include <libdevcore/Log.h>
-#include <libp2p/Host.h>
+//#include <libp2p/Host.h>
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include <memory>
@@ -36,7 +36,7 @@
 using namespace std;
 using namespace dev;
 using namespace dev::eth;
-using namespace p2p;
+//using namespace p2p;
 namespace fs = boost::filesystem;
 
 static_assert(BOOST_VERSION >= 106400, "Wrong boost headers version");
@@ -70,7 +70,7 @@ std::ostream& dev::eth::operator<<(std::ostream& _out, ActivityReport const& _r)
     return _out;
 }
 
-Client::Client(ChainParams const& _params, int _networkID, p2p::Host* _host,
+Client::Client(ChainParams const& _params, int _networkID,// p2p::Host* _host,
     std::shared_ptr<GasPricer> _gpForAdoption, fs::path const& _dbPath,
     fs::path const& _snapshotPath, WithExisting _forceAction, TransactionQueue::Limits const& _l)
   : ClientBase(),
@@ -85,7 +85,7 @@ Client::Client(ChainParams const& _params, int _networkID, p2p::Host* _host,
     m_postSeal(chainParams().accountStartNonce),
     m_working(chainParams().accountStartNonce)
 {
-    init(_host, _dbPath, _snapshotPath, _forceAction, _networkID);
+    init(_dbPath, _snapshotPath, _forceAction, _networkID);
 }
 
 Client::~Client()
@@ -95,8 +95,10 @@ Client::~Client()
     terminate();
 }
 
-void Client::init(p2p::Host* _extNet, fs::path const& _dbPath, fs::path const& _snapshotDownloadPath, WithExisting _forceAction, u256 _networkId)
+//p2p::Host* _extNet
+void Client::init(fs::path const& _dbPath, fs::path const& _snapshotDownloadPath, WithExisting _forceAction, u256 _networkId)
 {
+    (void)_networkId;
     DEV_TIMED_FUNCTION_ABOVE(500);
 
     // Cannot be opened until after blockchain is open, since BlockChain may upgrade the database.
@@ -119,10 +121,10 @@ void Client::init(p2p::Host* _extNet, fs::path const& _dbPath, fs::path const& _
     });  // TODO: should read m_bq->onReady(thisThread, syncBlockQueue);
     m_bq.setOnBad([=](Exception& ex) { this->onBadBlock(ex); });
     bc().setOnBad([=](Exception& ex) { this->onBadBlock(ex); });
-    bc().setOnBlockImport([=](BlockHeader const& _info) {
-        if (auto h = m_host.lock())
-            h->onBlockImported(_info);
-    });
+//    bc().setOnBlockImport([=](BlockHeader const& _info) {
+//        if (auto h = m_host.lock())
+//            h->onBlockImported(_info);
+//    });
 
     if (_forceAction == WithExisting::Rescue)
         bc().rescue(m_stateDB);
@@ -132,12 +134,12 @@ void Client::init(p2p::Host* _extNet, fs::path const& _dbPath, fs::path const& _
     // create Ethereum capability only if we're not downloading the snapshot
     if (_snapshotDownloadPath.empty())
     {
-        auto host = _extNet->registerCapability(
-            make_shared<EthereumHost>(bc(), m_stateDB, m_tq, m_bq, _networkId));
-        m_host = host;
-
-        _extNet->addCapability(host, EthereumHost::staticName(),
-            EthereumHost::c_oldProtocolVersion);  // TODO: remove this once v61+ protocol is common
+//        auto host = _extNet->registerCapability(
+//            make_shared<EthereumHost>(bc(), m_stateDB, m_tq, m_bq, _networkId));
+//        m_host = host;
+//
+//        _extNet->addCapability(host, EthereumHost::staticName(),
+//            EthereumHost::c_oldProtocolVersion);  // TODO: remove this once v61+ protocol is common
     }
 
     // create Warp capability if we either download snapshot or can give out snapshot
@@ -147,8 +149,8 @@ void Client::init(p2p::Host* _extNet, fs::path const& _dbPath, fs::path const& _
     {
         std::shared_ptr<SnapshotStorageFace> snapshotStorage(
             importedSnapshotExists ? createSnapshotStorage(importedSnapshot) : nullptr);
-        m_warpHost = _extNet->registerCapability(make_shared<WarpHostCapability>(
-            bc(), _networkId, _snapshotDownloadPath, snapshotStorage));
+//        m_warpHost = _extNet->registerCapability(make_shared<WarpHostCapability>(
+//            bc(), _networkId, _snapshotDownloadPath, snapshotStorage));
     }
 
     if (_dbPath.size())
@@ -203,31 +205,32 @@ void Client::callQueuedFunctions()
 
 u256 Client::networkId() const
 {
-    if (auto h = m_host.lock())
-        return h->networkId();
+//    if (auto h = m_host.lock())
+//        return h->networkId();
     return 0;
 }
 
 void Client::setNetworkId(u256 const& _n)
 {
-    if (auto h = m_host.lock())
-        h->setNetworkId(_n);
+    (void)_n;
+//    if (auto h = m_host.lock())
+//        h->setNetworkId(_n);
 }
 
 bool Client::isSyncing() const
 {
-    if (auto h = m_host.lock())
-        return h->isSyncing();
+//    if (auto h = m_host.lock())
+//        return h->isSyncing();
     return false;
 }
 
 bool Client::isMajorSyncing() const
 {
-    if (auto h = m_host.lock())
-    {
-        SyncState state = h->status().state;
-        return state != SyncState::Idle || h->bq().items().first > 10;
-    }
+//    if (auto h = m_host.lock())
+//    {
+//        SyncState state = h->status().state;
+//        return state != SyncState::Idle || h->bq().items().first > 10;
+//    }
     return false;
 }
 
@@ -299,8 +302,8 @@ void Client::reopenChain(ChainParams const& _p, WithExisting _we)
         m_working = Block(chainParams().accountStartNonce);
     }
 
-    if (auto h = m_host.lock())
-        h->reset();
+//    if (auto h = m_host.lock())
+//        h->reset();
 
     startedWorking();
     doWork();
@@ -450,8 +453,8 @@ void Client::syncTransactionQueue()
     noteChanged(changeds);
 
     // Tell network about the new transactions.
-    if (auto h = m_host.lock())
-        h->noteNewTransactions();
+//    if (auto h = m_host.lock())
+//        h->noteNewTransactions();
 
     ctrace << "Processed " << newPendingReceipts.size() << " transactions in" << (timer.elapsed() * 1000) << "(" << (bool)m_syncTransactionQueue << ")";
 }
@@ -481,8 +484,8 @@ void Client::onNewBlocks(h256s const& _blocks, h256Hash& io_changed)
     for (auto const& h: _blocks)
         LOG(m_loggerDetail) << "Live block: " << h;
 
-    if (auto h = m_host.lock())
-        h->noteNewBlocks();
+//    if (auto h = m_host.lock())
+//        h->noteNewBlocks();
 
     for (auto const& h: _blocks)
         appendFromBlock(h, BlockPolarity::Live, io_changed);
@@ -790,12 +793,12 @@ Transactions Client::pending() const
 
 SyncStatus Client::syncStatus() const
 {
-    auto h = m_host.lock();
-    if (!h)
-        return SyncStatus();
-    SyncStatus status = h->status();
-    status.majorSyncing = isMajorSyncing();
-    return status;
+//    auto h = m_host.lock();
+//    if (!h)
+//        return SyncStatus();
+//    SyncStatus status = h->status();
+//    status.majorSyncing = isMajorSyncing();
+    return SyncStatus();
 }
 
 bool Client::submitSealed(bytes const& _header)
@@ -833,9 +836,9 @@ void Client::rewind(unsigned _n)
             break;
         this_thread::sleep_for(std::chrono::milliseconds(50));
     }
-    auto h = m_host.lock();
-    if (h)
-        h->reset();
+//    auto h = m_host.lock();
+//    if (h)
+//        h->reset();
     m_tq.clear();
     m_bq.clear();
 }

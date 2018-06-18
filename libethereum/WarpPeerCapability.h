@@ -20,7 +20,8 @@
 #include "CommonNet.h"
 
 #include <libdevcore/Common.h>
-#include <libp2p/Capability.h>
+//#include <libp2p/Capability.h>
+#include <libdevcore/RLP.h>
 
 namespace dev
 {
@@ -58,11 +59,11 @@ public:
     virtual void onPeerDisconnect(std::shared_ptr<WarpPeerCapability> _peer, Asking _asking) = 0;
 };
 
-class WarpPeerCapability : public p2p::Capability
+class WarpPeerCapability// : public p2p::Capability
 {
 public:
-    WarpPeerCapability(std::shared_ptr<p2p::SessionFace> _s, p2p::HostCapabilityFace* _h,
-        unsigned _i, p2p::CapDesc const& _cap);
+//    WarpPeerCapability(std::shared_ptr<p2p::SessionFace> _s, p2p::HostCapabilityFace* _h,
+//        unsigned _i, p2p::CapDesc const& _cap);
 
     static std::string name() { return "par"; }
 
@@ -92,14 +93,14 @@ public:
 
     u256 snapshotNumber() const { return m_snapshotNumber; }
 
-    using p2p::Capability::disable;
+//    using p2p::Capability::disable;
 
 private:
-    using p2p::Capability::sealAndSend;
+//    using p2p::Capability::sealAndSend;
 
-    bool interpret(unsigned _id, RLP const& _r) override;
+    bool interpret(unsigned _id, RLP const& _r);
 
-    void onDisconnect() override;
+    void onDisconnect();
 
     void setAsking(Asking _a);
 

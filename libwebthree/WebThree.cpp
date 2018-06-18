@@ -18,7 +18,7 @@
 #include "WebThree.h"
 
 #include <libethereum/Defaults.h>
-#include <libethereum/EthereumHost.h>
+//#include <libethereum/EthereumHost.h>
 #include <libethereum/ClientTest.h>
 #include <libethashseal/EthashClient.h>
 #include <libethashseal/Ethash.h>
@@ -30,7 +30,7 @@
 
 using namespace std;
 using namespace dev;
-using namespace dev::p2p;
+//using namespace dev::p2p;
 using namespace dev::eth;
 using namespace dev::shh;
 
@@ -39,21 +39,27 @@ static_assert(BOOST_VERSION >= 106400, "Wrong boost headers version");
 WebThreeDirect::WebThreeDirect(std::string const& _clientVersion,
     boost::filesystem::path const& _dbPath, boost::filesystem::path const& _snapshotPath,
     eth::ChainParams const& _params, WithExisting _we, std::set<std::string> const& _interfaces,
-    NetworkPreferences const& _n, bytesConstRef _network, bool _testing)
-  : m_clientVersion(_clientVersion), m_net(_clientVersion, _n, _network)
+//    NetworkPreferences const& _n,
+                               bytesConstRef _network, bool _testing)
+  : m_clientVersion(_clientVersion)//, m_net(_clientVersion, _n, _network)
 {
+    (void)_snapshotPath;
+    (void)_params;
+    (void)_we;
+    (void)_network;
+    (void)_testing;
     if (_dbPath.size())
         Defaults::setDBPath(_dbPath);
     if (_interfaces.count("eth"))
     {
         Ethash::init();
         NoProof::init();
-        if (_params.sealEngineName == "Ethash")
-            m_ethereum.reset(new eth::EthashClient(_params, (int)_params.networkID, &m_net, shared_ptr<GasPricer>(), _dbPath, _snapshotPath, _we));
-        else if (_params.sealEngineName == "NoProof" && _testing)
-            m_ethereum.reset(new eth::ClientTest(_params, (int)_params.networkID, &m_net, shared_ptr<GasPricer>(), _dbPath, _we));
-        else
-            m_ethereum.reset(new eth::Client(_params, (int)_params.networkID, &m_net, shared_ptr<GasPricer>(), _dbPath, _snapshotPath, _we));
+//        if (_params.sealEngineName == "Ethash")
+//            m_ethereum.reset(new eth::EthashClient(_params, (int)_params.networkID, &m_net, shared_ptr<GasPricer>(), _dbPath, _snapshotPath, _we));
+//        else if (_params.sealEngineName == "NoProof" && _testing)
+//            m_ethereum.reset(new eth::ClientTest(_params, (int)_params.networkID, &m_net, shared_ptr<GasPricer>(), _dbPath, _we));
+//        else
+//            m_ethereum.reset(new eth::Client(_params, (int)_params.networkID, &m_net, shared_ptr<GasPricer>(), _dbPath, _snapshotPath, _we));
         m_ethereum->startWorking();
 
         const auto* buildinfo = aleth_get_buildinfo();
@@ -77,7 +83,7 @@ WebThreeDirect::~WebThreeDirect()
     // still referencing Sessions getting deleted *after* m_ethereum is reset, causing bad things to happen, since
     // the guarantee is that m_ethereum is only reset *after* all sessions have ended (sessions are allowed to
     // use bits of data owned by m_ethereum).
-    m_net.stop();
+//    m_net.stop();
 }
 
 std::string WebThreeDirect::composeClientVersion(std::string const& _client)
@@ -86,59 +92,59 @@ std::string WebThreeDirect::composeClientVersion(std::string const& _client)
     return _client + "/" + buildinfo->project_version + "/" + buildinfo->system_name + "/" +
            buildinfo->compiler_id + buildinfo->compiler_version + "/" + buildinfo->build_type;
 }
+//
+//p2p::NetworkPreferences const& WebThreeDirect::networkPreferences() const
+//{
+//    return m_net.networkPreferences();
+//}
+//
+//void WebThreeDirect::setNetworkPreferences(p2p::NetworkPreferences const& _n, bool _dropPeers)
+//{
+//    auto had = isNetworkStarted();
+//    if (had)
+//        stopNetwork();
+//    m_net.setNetworkPreferences(_n, _dropPeers);
+//    if (had)
+//        startNetwork();
+//}
+//
+//std::vector<PeerSessionInfo> WebThreeDirect::peers()
+//{
+//    return m_net.peerSessionInfo();
+//}
+//
+//size_t WebThreeDirect::peerCount() const
+//{
+//    return m_net.peerCount();
+//}
+//
+//void WebThreeDirect::setIdealPeerCount(size_t _n)
+//{
+//    return m_net.setIdealPeerCount(_n);
+//}
+//
+//void WebThreeDirect::setPeerStretch(size_t _n)
+//{
+//    return m_net.setPeerStretch(_n);
+//}
+//
+//bytes WebThreeDirect::saveNetwork()
+//{
+//    return m_net.saveNetwork();
+//}
 
-p2p::NetworkPreferences const& WebThreeDirect::networkPreferences() const
-{
-    return m_net.networkPreferences();
-}
-
-void WebThreeDirect::setNetworkPreferences(p2p::NetworkPreferences const& _n, bool _dropPeers)
-{
-    auto had = isNetworkStarted();
-    if (had)
-        stopNetwork();
-    m_net.setNetworkPreferences(_n, _dropPeers);
-    if (had)
-        startNetwork();
-}
-
-std::vector<PeerSessionInfo> WebThreeDirect::peers()
-{
-    return m_net.peerSessionInfo();
-}
-
-size_t WebThreeDirect::peerCount() const
-{
-    return m_net.peerCount();
-}
-
-void WebThreeDirect::setIdealPeerCount(size_t _n)
-{
-    return m_net.setIdealPeerCount(_n);
-}
-
-void WebThreeDirect::setPeerStretch(size_t _n)
-{
-    return m_net.setPeerStretch(_n);
-}
-
-bytes WebThreeDirect::saveNetwork()
-{
-    return m_net.saveNetwork();
-}
-
-void WebThreeDirect::addNode(NodeID const& _node, bi::tcp::endpoint const& _host)
-{
-    m_net.addNode(_node, NodeIPEndpoint(_host.address(), _host.port(), _host.port()));
-}
-
-void WebThreeDirect::requirePeer(NodeID const& _node, bi::tcp::endpoint const& _host)
-{
-    m_net.requirePeer(_node, NodeIPEndpoint(_host.address(), _host.port(), _host.port()));
-}
-
-void WebThreeDirect::addPeer(NodeSpec const& _s, PeerType _t)
-{
-    m_net.addPeer(_s, _t);
-}
-
+//void WebThreeDirect::addNode(NodeID const& _node, bi::tcp::endpoint const& _host)
+//{
+//    m_net.addNode(_node, NodeIPEndpoint(_host.address(), _host.port(), _host.port()));
+//}
+//
+//void WebThreeDirect::requirePeer(NodeID const& _node, bi::tcp::endpoint const& _host)
+//{
+//    m_net.requirePeer(_node, NodeIPEndpoint(_host.address(), _host.port(), _host.port()));
+//}
+//
+//void WebThreeDirect::addPeer(NodeSpec const& _s, PeerType _t)
+//{
+//    m_net.addPeer(_s, _t);
+//}
+//
